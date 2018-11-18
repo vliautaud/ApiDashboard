@@ -2,6 +2,7 @@
 *.sqlite3
 conf
 conf/
+conf/*
 ocado.cfg
 settings.py
 .gitignore
