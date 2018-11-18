@@ -1,0 +1,9 @@
+# A Ignorer
+*.sqlite3
+conf
+conf/
+ocado.cfg
+settings.py
+.gitignore
+
+
