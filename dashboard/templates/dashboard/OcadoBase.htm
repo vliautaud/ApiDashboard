@@ -1,0 +1,129 @@
+﻿{% load static %}
+{% load viltags %}
+{% block header %}
+<!DOCTYPE html >
+<HTML lang="en">
+<HEAD>
+    <META content="IE=11.0000"
+          http-equiv="X-UA-Compatible">
+
+    <META charset="utf-8">
+    <META http-equiv="X-UA-Compatible" content="IE=edge">
+    <META name="viewport" content="width=device-width, initial-scale=1">
+    <META name="description" content="">
+    <META name="author" content="">
+    <TITLE>API Dashboard</TITLE>
+    <!-- Bootstrap Core CSS -->
+    <LINK href="{% static 'dashboard/css/bootstrap.min.css' %}" rel="stylesheet">
+    <!-- MetisMenu CSS -->
+    <LINK href="{% static 'dashboard/css/metisMenu.min.css' %}" rel="stylesheet">
+    <!-- Custom CSS -->
+    <LINK href="{% static 'dashboard/css/sb-admin-2.css' %}" rel="stylesheet">
+    <!-- JQuery Confirm CSS -->
+    <LINK href="{% static 'dashboard/css/jquery-confirm.min.css' %}" rel="stylesheet">
+    <!-- Morris Charts CSS -->
+    <LINK href="{% static 'dashboard/css/morris.css' %}" rel="stylesheet">
+    <!-- Custom Fonts -->
+    <LINK href="{% static 'dashboard/css/font-awesome.min.css' %}" rel="stylesheet" type="text/css">
+    <!-- DatePicker -->
+    <LINK href="{% static 'dashboard/css/flatpickr.min.css' %}" rel="stylesheet" type="text/css">
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+          <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+          <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>>
+     -->
+    <SCRIPT src="{% static 'dashboard/js/jquery.min.js' %}"></SCRIPT>
+    <SCRIPT src="{% static 'dashboard/js/bootstrap.min.js' %}"></SCRIPT>
+    <SCRIPT src="{% static 'dashboard/js/metisMenu.min.js' %}"></SCRIPT>
+    <SCRIPT src="{% static 'dashboard/js/raphael.min.js' %}"></SCRIPT>
+    <SCRIPT src="{% static 'dashboard/js/morris.min.js' %}"></SCRIPT>
+    <SCRIPT src="{% static 'dashboard/js/morris-data.js' %}"></SCRIPT>
+    <SCRIPT src="{% static 'dashboard/js/sb-admin-2.js' %}"></SCRIPT>
+    <SCRIPT src="{% static 'dashboard/js/jquery-confirm.min.js' %}"></SCRIPT>
+    <SCRIPT src="{% static 'dashboard/js/flatpickr.js' %}"></SCRIPT>
+
+    <META name="GENERATOR" content="MSHTML 11.00.10570.1001">
+</HEAD>
+{% endblock %}
+{% block body %}
+<BODY>
+{% block navigation %}
+<DIV id="wrapper">
+    <!-- Navigation -->
+    <NAV class="navbar navbar-default navbar-static-top"
+         role="navigation" style="margin-bottom: 0px;">
+        <DIV class="navbar-header">
+            <BUTTON class="navbar-toggle" type="button"
+                    data-toggle="collapse" data-target=".navbar-collapse"><SPAN
+                    class="sr-only">Toggle navigation</SPAN> <SPAN class="icon-bar"></SPAN><SPAN
+                    class="icon-bar"></SPAN><SPAN class="icon-bar"></SPAN></BUTTON>
+            <A class="navbar-brand" href="#">OCADO Dashboard</A>
+        </DIV><!-- /.navbar-header -->
+        <UL class="nav navbar-top-links navbar-right">
+
+            <LI class="dropdown"><A class="dropdown-toggle" href="#"
+                                    data-toggle="dropdown"><I class="fa fa-bell fa-fw"></I> <I
+                    class="fa fa-caret-down"></I>
+            </A>
+                <UL class="dropdown-menu dropdown-alerts">
+                    <LI><A href="#">
+                        <DIV><I class="fa fa-comment fa-fw"></I> For Future use...
+                            <SPAN class="pull-right text-muted small">4 minutes ago</SPAN>
+                        </DIV>
+                    </A></LI>
+                    <LI class="divider"></LI>
+                    <LI><A href="#">
+                        <DIV><I class="fa fa-twitter fa-fw"></I> For Future use...
+                            <SPAN class="pull-right text-muted small">12 minutes
+    ago</SPAN></DIV>
+                    </A></LI>
+                </UL><!-- /.dropdown-alerts -->
+            </LI><!-- /.dropdown -->
+            <LI class="dropdown"><A class="dropdown-toggle" href="#"
+                                    data-toggle="dropdown"><I class="fa fa-user fa-fw"></I> <I
+                    class="fa fa-caret-down"></I>
+            </A>
+                <UL class="dropdown-menu dropdown-user">
+                    <LI><A href="/admin"><I
+                            class="fa fa-gear fa-fw"></I> Settings</A></LI>
+                    <LI class="divider"></LI>
+                    <LI><A href="{% url 'ocado:ocado_logout' %}"><I
+                            class="fa fa-sign-out fa-fw"></I> Logout</A></LI>
+                </UL><!-- /.dropdown-user -->
+            </LI><!-- /.dropdown -->             </UL><!-- /.navbar-top-links -->
+
+        <DIV class="navbar-default sidebar" role="navigation">
+            <DIV class="sidebar-nav navbar-collapse">
+                <UL class="nav" id="side-menu">
+
+                    <LI><A href="{% url 'ocado:dashboard' %}"><I
+                            class="fa fa-dashboard fa-fw"></I> Dashboard</A></LI>
+                    <LI><A href="{% url 'ocado:client_api' %}"><I
+                            class="fa fa-rocket fa-fw"></I> Client API</A></LI>
+                    <LI><A href="#"><I
+                            class="fa fa-table fa-fw"></I> DataFeeds</A></LI>
+                    <LI><A href="#"><I
+                            class="fa fa-heart fa-fw"></I> Promotions</A></LI>
+                </UL>
+            </DIV><!-- /.sidebar-collapse -->
+        </DIV><!-- /.navbar-static-side -->
+    </NAV>
+    {% endblock %}
+    <DIV id="page-wrapper">
+        <DIV class="row">
+            <DIV class="col-lg-12">
+                <H2 class="page-header" style="margin-top:10px">{% block titrePage %}OCADO{% endblock %}<img width="200"
+                                                                                     class="img-rounded pull-right"
+                                                                                     src="{% static 'dashboard/images/ocado.png' %}">
+                </H2></DIV><!-- /.col-lg-12 -->
+        </DIV><!-- /.row -->
+        {% block content %}
+        {% endblock %}
+    </DIV><!-- /#page-wrapper -->
+</DIV><!-- /#wrapper -->
+
+
+</BODY>
+{% endblock %}
+</HTML>

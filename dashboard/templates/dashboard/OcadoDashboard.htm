@@ -1,0 +1,276 @@
+﻿{% extends 'dashboard/OcadoBase.htm' %}
+{% load static %}
+{% load viltags %}
+{% block titrePage %}Ocado Dashboard{% endblock %}
+{% block content %}
+<script>
+function removeApiCall(api_call_id) {
+$.confirm({
+    title: 'Confirmer la suppression !',
+    content: 'Merci de confirmer la suppression SVP!',
+     buttons: {
+        confirm: function () {
+         $( "#api_call_id" ).val(api_call_id);
+         $( "#dashboard_form").submit();
+    },
+    cancel: function () {
+        $.alert('Abandon...');
+    },
+
+    }
+});
+};
+
+</script>
+<DIV class="row">
+    <DIV class="col-lg-3 col-md-6">
+        <DIV class="panel panel-primary">
+            <DIV class="panel-heading">
+                <DIV class="row">
+                    <DIV class="col-xs-3"><I class="fa  fa-download  fa-5x"></I>
+                    </DIV>
+                    <DIV class="col-xs-9 text-right">
+                        <DIV class="huge">{{nb_get}}</DIV>
+                        <DIV>Get Calls...</DIV>
+                    </DIV>
+                </DIV>
+            </DIV>
+            <A href="?VERBE=GET">
+                <DIV class="panel-footer"><SPAN class="pull-left">View Details</SPAN>
+                    <SPAN class="pull-right"><I class="fa fa-arrow-circle-right"></I></SPAN>
+
+                    <DIV class="clearfix"></DIV>
+                </DIV>
+            </A></DIV>
+    </DIV>
+    <DIV class="col-lg-3 col-md-6">
+        <DIV class="panel panel-green">
+            <DIV class="panel-heading">
+                <DIV class="row">
+                    <DIV class="col-xs-3"><I class="fa fa-edit fa-5x"></I>
+                    </DIV>
+                    <DIV class="col-xs-9 text-right">
+                        <DIV class="huge">{{ nb_put }}</DIV>
+                        <DIV>Put Calls...</DIV>
+                    </DIV>
+                </DIV>
+            </DIV>
+            <A href="?VERBE=PUT">
+                <DIV class="panel-footer"><SPAN class="pull-left">View Details</SPAN>
+                    <SPAN class="pull-right"><I class="fa fa-arrow-circle-right"></I></SPAN>
+
+                    <DIV class="clearfix"></DIV>
+                </DIV>
+            </A></DIV>
+    </DIV>
+    <DIV class="col-lg-3 col-md-6">
+        <DIV class="panel panel-yellow">
+            <DIV class="panel-heading">
+                <DIV class="row">
+                    <DIV class="col-xs-3"><I class="fa fa-plus-circle  fa-5x"></I>
+                    </DIV>
+                    <DIV class="col-xs-9 text-right">
+                        <DIV class="huge">{{ nb_post }}</DIV>
+                        <DIV>Post Calls...</DIV>
+                    </DIV>
+                </DIV>
+            </DIV>
+            <A href="?VERBE=POST">
+                <DIV class="panel-footer"><SPAN class="pull-left">View Details</SPAN>
+                    <SPAN class="pull-right"><I class="fa fa-arrow-circle-right"></I></SPAN>
+
+                    <DIV class="clearfix"></DIV>
+                </DIV>
+            </A></DIV>
+    </DIV>
+    <DIV class="col-lg-3 col-md-6">
+        <DIV class="panel panel-red">
+            <DIV class="panel-heading">
+                <DIV class="row">
+                    <DIV class="col-xs-3"><I class="fa fa-eraser  fa-5x"></I>
+                    </DIV>
+                    <DIV class="col-xs-9 text-right">
+                        <DIV class="huge">{{ nb_delete }}</DIV>
+                        <DIV>Delete Calls...</DIV>
+                    </DIV>
+                </DIV>
+            </DIV>
+            <A href="?VERBE=DELETE">
+                <DIV class="panel-footer"><SPAN class="pull-left">View Details</SPAN>
+                    <SPAN class="pull-right"><I class="fa fa-arrow-circle-right"></I></SPAN>
+
+                    <DIV class="clearfix"></DIV>
+                </DIV>
+            </A></DIV>
+    </DIV>
+</DIV><!-- /.row -->
+
+<DIV class="row">
+    <DIV class="col-lg-9">
+        <DIV class="panel panel-default">
+            <DIV class="panel-heading"><I class="fa fa-bar-chart-o fa-fw"></I> Historique des appels
+
+                <DIV class="pull-right">
+                    <DIV class="btn-group">
+                        <BUTTON class="btn btn-default btn-xs dropdown-toggle"
+                                type="button" data-toggle="dropdown">
+                            Actions <SPAN class="caret"></SPAN>
+                        </BUTTON>
+                        <UL class="dropdown-menu pull-right" role="menu">
+                            <LI><A href="#">Action</A></LI>
+                            <LI><A href="#">Another
+                                action</A></LI>
+                            <LI><A href="#">Something
+                                else here</A></LI>
+                            <LI class="divider"></LI>
+                            <LI><A href="#">Separated
+                                link</A></LI>
+                        </UL>
+                    </DIV>
+                </DIV>
+            </DIV><!-- /.panel-heading -->
+
+            <DIV class="panel-body">
+                <DIV class="row">
+                    <DIV class="col-lg-12">
+                        <form class="form-inline" action="{% url 'ocado:dashboard'%}" id="FORM_SEARCH" method="POST">
+                            {% csrf_token %}
+                            <div class="form-group">
+                                <label for="DateDebut">From : </label>
+                                <input class="form-control flatpickr flatpickr-input active" id="DDEB" name="DDEB" style="width:120px"
+                                       type="text" readonly="readonly" placeholder="Date de début" value="{{ SEARCH.DDEB }}">
+                            </div>
+                            <div class="form-group">
+                                <label for="DFIN">To : </label>
+                                <input class="form-control flatpickr flatpickr-input active" id="DFIN" name="DFIN" style="width:120px"
+                                readonly="readonly" placeholder="Date de fin" value="{{ SEARCH.DFIN }}">
+                            </div>
+
+                            <div class="form-group">
+
+                                <label for="Verbe">Verbe : </label>
+                                <SELECT class="form-control" name="VERBE" id="VERBE" >
+                                    <option></option>
+                                    <option {% if SEARCH.VERBE == "GET" %}selected {% endif %}>GET</option>
+                                    <option {% if SEARCH.VERBE == "PUT" %}selected {% endif %}>PUT</option>
+                                    <option {% if SEARCH.VERBE == "POST" %}selected {% endif %}>POST</option>
+                                    <option {% if SEARCH.VERBE == "DELETE" %}selected {% endif %}>DELETE</option>
+                             <!--   <input class="form-control" id="VERBE" name="VERBE" placeholder="Verbe" value="{{ SEARCH.VERBE }}"> -->
+                                </SELECT>
+                            </div>
+                            <div class="form-group">
+                                <label for="USER">USER : </label>
+                                <input class="form-control" id="USER" name="USER" placeholder="Contient User" value="{{ SEARCH.USER }}" style="width:130px">
+                            </div>
+                            <div class="form-group">
+                                <label for="URL">URL : </label>
+                                <input class="form-control" id="URL" name="URL" placeholder="Contient URL" value="{{ SEARCH.URL }}" style="width:130px">
+                            </div>
+                             <input type="hidden" name="page" id="page" value="{{ latest_calls.number }}"/>
+
+                            <button class="btn btn-info pull-right" type="submit">
+                                <I class="fa fa-search fa-fw"></I> Search
+                            </button>
+                        </form>
+                        <DIV class="table-responsive">
+                            <TABLE class="table table-bordered table-hover table-striped">
+                                <THEAD>
+                                <TR>
+                                    <TH>#</TH>
+                                    <TH>Date</TH>
+                                    <TH>Durée</TH>
+                                    <TH>Env</TH>
+                                    <TH>Verbe</TH>
+                                    <TH>User</TH>
+                                    <TH>URL</TH>
+                                    <TH>Code Retour</TH>
+                                </TR>
+                                </THEAD>
+                                <TBODY>
+                                {% for api_call in latest_calls %}
+                                <TR  style="font-size:14px">
+
+                                    <TD ><a href="{% url 'ocado:client_api_id' api_call.id %}">{{ api_call.id }}</a></TD>
+                                    <TD>{{ api_call.api_call_date }}</TD>
+                                    <TD>{% ecart_date api_call.api_call_date api_call.api_res_date %}</TD>
+                                    <TD>{{ api_call.api_env }}</TD>
+                                    <TD>{{ api_call.api_verbe }}</TD>
+                                    <TD>{{ api_call.api_user }}</TD>
+                                    <TD>{{ api_call.api_suffix_url }}</TD>
+                                    <TD>{{ api_call.api_res_retcode }} <I style="font-size:18px"
+                                            class="fa fa-trash-o fa-fw text-danger pull-right"
+                                            onclick="removeApiCall({{ api_call.id }})"></I></TD>
+                                </TR>
+                                {% endfor %}
+                                </TBODY>
+                            </TABLE>
+                        </DIV><!-- /.table-responsive -->
+                    </DIV><!-- /.col-lg-4 (nested) -->
+                </DIV><!-- /.row -->
+
+                <DIV class="row">
+                    <DIV class="col-md-6">
+                        <div class="pull-left" style="margin-top:10px">
+                            Affichage {{latest_calls.start_index}} à {{latest_calls.end_index}} des
+                            {{latest_calls.paginator.count}} premiers enregistrements
+                        </div>
+                    </DIV>
+                    <DIV class="col-md-6">
+                        <ul class="pagination pull-right" style="margin:0">
+                            {% if latest_calls.has_previous %}
+                            <li><a href="?page={{ latest_calls.previous_page_number }}">Previous</a></li>
+                            {% else %}
+                            <li class="disabled"><a href="#">Previous</a></li>
+                            {% endif %}
+
+                            {% for page in page_list %}
+                            {% if page == latest_calls.number %}
+                            <li class="active"><a href="?page={{ page }}">{{ page }}</a></li>
+                            {% else %}
+                            <li><a href="?page={{ page }}">{{ page }}</a></li>
+                            {% endif %}
+                            {% endfor %}
+                            {% if latest_calls.has_next %}
+                            <li><a href="?page={{ latest_calls.next_page_number }}">Next</a></li>
+                            {% else %}
+                            <li class="disabled"><a href="#">Next</a></li>
+                            {% endif %}
+
+                        </ul>
+                    </DIV>
+                </DIV>
+
+            </DIV><!-- /.panel-body -->
+        </DIV><!-- /.panel -->
+    </DIV><!-- /.col-lg-9 -->
+
+    <DIV class="col-lg-3">
+        <DIV class="panel panel-default">
+            <DIV class="panel-heading"><I class="fa fa-bell fa-fw"></I> Return Code...
+            </DIV><!-- /.panel-heading -->
+            <DIV class="panel-body">
+                <DIV class="list-group">
+                    {% for code_ret in codes_ret %}
+                    <A class="list-group-item " href="#">
+                        <I class="fa {% if code_ret.api_res_retcode <= "200"  %}fa-child green{% endif %}
+                                     {% if code_ret.api_res_retcode > "200" and code_ret.api_res_retcode < "500" %}fa-warning orange {% endif %}
+                                     {% if code_ret.api_res_retcode >= "500"  %}fa-bolt red {% endif %} fa-fw"></I>  {{ code_ret.api_res_retcode }}<SPAN class="pull-right text-muted small"><EM>{{ code_ret.id__count }} Occurences</EM></SPAN>
+                    </A>
+                    {% endfor %}
+                </DIV><!-- /.list-group -->
+                </DIV><!-- /.panel-body -->
+        </DIV><!-- /.panel -->
+    </DIV><!-- /.col-lg-3 -->
+</DIV><!-- /.row -->
+<form role="form" id="dashboard_form" action="{% url 'ocado:remove_api_call'%}" method="post">
+    {% csrf_token %}
+    <input type="hidden" name="api_call_id" id="api_call_id" value=""/>
+</form>
+
+<script>
+$("#DDEB").flatpickr({dateFormat : "d/m/Y"});
+$("#DFIN").flatpickr({dateFormat : "d/m/Y"});
+</script>
+
+
+{% endblock %}
