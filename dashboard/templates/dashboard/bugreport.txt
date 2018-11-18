@@ -1,0 +1,25 @@
+BUG REPORT FOR API CALL TESTING
+================================
+
+Tester                  : {{ api_user|safe }}
+Date/Time API Call      : {{ api_call_date|safe }}
+Date/Time Reponse       : {{ api_res_date|safe }}
+Environment             : {{ api_env|safe }}
+
+VERB / URL              : {{ api_verbe|safe }}  {{ api_url|safe }}
+
+
+Request JSON Payload (Optionnal)
+----------------------------------------------------------------------------
+{{ api_payload|safe }}
+----------------------------------------------------------------------------
+
+HTTP Response Code      : {{ api_res_retcode|safe }}
+
+
+HTTP Response Header    : {{ api_res_header|safe }}
+
+Response Body
+----------------------------------------------------------------------------
+{{ api_res_body|safe }}
+----------------------------------------------------------------------------

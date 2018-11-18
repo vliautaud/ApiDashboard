@@ -197,9 +197,11 @@ $.confirm({
                                     <TD>{{ api_call.api_verbe }}</TD>
                                     <TD>{{ api_call.api_user }}</TD>
                                     <TD>{{ api_call.api_suffix_url }}</TD>
-                                    <TD>{{ api_call.api_res_retcode }} <I style="font-size:18px"
-                                            class="fa fa-trash-o fa-fw text-danger pull-right"
-                                            onclick="removeApiCall({{ api_call.id }})"></I></TD>
+                                    <TD>{{ api_call.api_res_retcode }}
+                                           <I style="font-size:18px" class="fa fa-trash-o fa-fw text-danger pull-right" onclick="removeApiCall({{ api_call.id }})"></I>
+                                           <I style="font-size:18px" class="fa fa-bug fa-fw text-danger pull-right" onclick="open('{% url 'ocado:bug_report' api_call.id %}', 'Popup', 'scrollbars=1,resizable=1,height=560,width=770'); return false;"></I>
+                                    </TD>
+
                                 </TR>
                                 {% endfor %}
                                 </TBODY>
@@ -262,7 +264,7 @@ $.confirm({
         </DIV><!-- /.panel -->
     </DIV><!-- /.col-lg-3 -->
 </DIV><!-- /.row -->
-<form role="form" id="dashboard_form" action="{% url 'ocado:remove_api_call'%}" method="post">
+<form role="form" id="dashboard_form" action="{% url 'ocado:remove_api_call' %}" method="post">
     {% csrf_token %}
     <input type="hidden" name="api_call_id" id="api_call_id" value=""/>
 </form>

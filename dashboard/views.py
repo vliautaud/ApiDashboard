@@ -207,11 +207,37 @@ def client_api_id(request,api_call_id):
 ###################################################################
 @login_required(login_url='/ocado/accounts/login/')
 def remove_api_call(request):
-    print(request.POST)
     api_call = get_object_or_404(ApiCall, pk=request.POST.get("api_call_id"))
     api_call.delete()
     return HttpResponseRedirect(reverse('ocado:dashboard'))
 
+
+@login_required(login_url='/ocado/accounts/login/')
+def client_api(request):
+    return client_api_id(request,"")
+
+
+
+###################################################################
+# VUE bug_report
+###################################################################
+@login_required(login_url='/ocado/accounts/login/')
+def bug_report(request,api_call_id):
+    appel_api = get_object_or_404(ApiCall, pk=api_call_id)
+    context = {
+                'api_call_date' : appel_api.api_call_date,
+                'api_res_date' : appel_api.api_res_date ,
+                'api_verbe' : appel_api.api_verbe ,
+                'api_env'  : appel_api.api_env ,
+                'api_user' : appel_api.api_user ,
+                'api_url' : appel_api.api_url,
+                'api_header' : appel_api.api_header ,
+                'api_payload' : appel_api.api_payload ,
+                'api_res_retcode'  : appel_api.api_res_retcode ,
+                'api_res_header' : appel_api.api_res_header ,
+                'api_res_body' : appel_api.api_res_body
+              }
+    return render(request, 'dashboard/bugreport.txt',context,content_type='text/plain')
 
 
 
