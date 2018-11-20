@@ -8,6 +8,7 @@ import dashboard.viltools.paginatorVil as paginatorVil
 import dashboard.viltools.vil_tools as vil_tools
 import dashboard.viltools.OcadoSession as OcadoSession
 import json
+import csv
 import pytz
 from django.contrib.auth import  logout
 from django.utils import timezone
@@ -246,6 +247,8 @@ def bug_report(request,api_call_id):
 @login_required(login_url='/ocado/accounts/login/')
 def exportcsv(request):
     dict_context = dict(request.session.get("CONTEXT", {}).items())
+    response=HttpResponse(content_type='text\csv')
+    response['Content-Disposition']='attachment ; filename="export_api_call.csv"'
     #Si criteres de recherches stockees en session sont renseignés
     where_clause = {}
     if dict_context.get("VERBE"):
@@ -264,9 +267,15 @@ def exportcsv(request):
         where_clause.update({"api_res_date__lt": datetime.datetime(annee, mois, jour, 23, 59, 59, tzinfo=pytz.UTC)})
 
     latest_calls = ApiCall.objects.filter(**where_clause).order_by('-api_call_date')
-    context={'latest_calls': latest_calls}
+    # Ecriture du CSV
+    # TODO : A retravailler pour batir fonction générique en fonction d'une liste QueryResult
+    writer=csv.writer(response,delimiter=';')
+    writer.writerow(['CALLID','DDEB_CALL','DFIN_CALL','USER','ENV','VERBE','URL','RET_CODE'])
+    for api_call in latest_calls :
+        writer.writerow([api_call.id,api_call.api_call_date,api_call.api_res_date,api_call.api_user,
+                         api_call.api_env,api_call.api_verbe,api_call.api_suffix_url,api_call.api_res_retcode])
 
-    return render(request, 'dashboard/exportcsv.csv',context,content_type='text/csv')
+    return response
 
 
 # ###############################################################
