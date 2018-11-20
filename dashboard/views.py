@@ -240,6 +240,34 @@ def bug_report(request,api_call_id):
     return render(request, 'dashboard/bugreport.txt',context,content_type='text/plain')
 
 
+###################################################################
+# VUE exportcsv
+###################################################################
+@login_required(login_url='/ocado/accounts/login/')
+def exportcsv(request):
+    dict_context = dict(request.session.get("CONTEXT", {}).items())
+    #Si criteres de recherches stockees en session sont renseignés
+    where_clause = {}
+    if dict_context.get("VERBE"):
+        where_clause.update({"api_verbe__exact": dict_context.get("VERBE")})
+    if dict_context.get("USER"):
+        where_clause.update({"api_user__contains": dict_context.get("USER")})
+    if dict_context.get("URL"):
+        where_clause.update({"api_url__contains": dict_context.get("URL")})
+    if dict_context.get("DDEB"):
+        jour, mois, annee = int(dict_context.get("DDEB")[0:2]), int(dict_context.get("DDEB")[3:5]), int(
+            dict_context.get("DDEB")[6:10])
+        where_clause.update({"api_call_date__gt": datetime.datetime(annee, mois, jour, tzinfo=pytz.UTC)})
+    if dict_context.get("DFIN"):
+        jour, mois, annee = int(dict_context.get("DFIN")[0:2]), int(dict_context.get("DFIN")[3:5]), int(
+            dict_context.get("DFIN")[6:10])
+        where_clause.update({"api_res_date__lt": datetime.datetime(annee, mois, jour, 23, 59, 59, tzinfo=pytz.UTC)})
+
+    latest_calls = ApiCall.objects.filter(**where_clause).order_by('-api_call_date')
+    context={'latest_calls': latest_calls}
+
+    return render(request, 'dashboard/exportcsv.csv',context,content_type='text/csv')
+
 
 # ###############################################################
 # Vue Logout

@@ -1,0 +1,3 @@
+ID;DEB_CALL;FIN_CALL;VERBE;URL;ENV;CODE_RET
+{% for ligne in latest_calls %}{{ ligne.id|safe }};{{ ligne.api_call_date|safe}};{{ligne.api_res_date|safe}};{{ligne.api_verbe|safe}};{{ligne.api_url_suffix}};{{ligne.api_env|safe}};{{ligne.api_res_retcode|safe}}
+{% endfor %}
