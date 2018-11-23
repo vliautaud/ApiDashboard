@@ -152,11 +152,11 @@ def client_api_id(request,api_call_id):
                 dateheurefin = timezone.now()
             elif request.POST.get("optionsRadiosVerbe") == "POST":
                 dateheuredeb = timezone.now()
-                res = ocadoSession.put(baseURL + request.POST.get("URL").strip(), "TESTVLD" + str(timezone.now()),**myPayload)
+                res = ocadoSession.post(baseURL + request.POST.get("URL").strip(), "TESTVLD" + str(timezone.now()),**myPayload)
                 dateheurefin = timezone.now()
             elif request.POST.get("optionsRadiosVerbe") == "DELETE":
                 dateheuredeb = timezone.now()
-                res = ocadoSession.put(baseURL + request.POST.get("URL").strip(), "TESTVLD" + str(timezone.now()),**myPayload)
+                res = ocadoSession.delete(baseURL + request.POST.get("URL").strip(), "TESTVLD" + str(timezone.now()),**myPayload)
                 dateheurefin = timezone.now()
             else :
                 context = {'FORM': request.POST, 'ERROR': "Erreur grave : ni Get, ni PUT, ni POST, ni DELETE !!!"}
