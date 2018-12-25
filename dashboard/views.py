@@ -35,7 +35,7 @@ def dashboard(request):
         dict_context=dict(request.POST.items())
         dict_context["page"]="1"
         request.session["CONTEXT"] = dict_context
-    else :
+    else : #On est en GET
         dict_context=dict(request.session.get("CONTEXT",{}).items())
         dict_context.update(dict(request.GET.items()))
         request.session["CONTEXT"] = dict_context
@@ -44,6 +44,8 @@ def dashboard(request):
     where_clause = {}
     if dict_context.get("VERBE") :
         where_clause.update({"api_verbe__exact":dict_context.get("VERBE")})
+    if dict_context.get("RETCODE") :
+        where_clause.update({"api_res_retcode__exact":dict_context.get("RETCODE")})
     if dict_context.get("USER") :
         where_clause.update({"api_user__contains":dict_context.get("USER")})
     if dict_context.get("URL") :
@@ -253,6 +255,8 @@ def exportcsv(request):
     where_clause = {}
     if dict_context.get("VERBE"):
         where_clause.update({"api_verbe__exact": dict_context.get("VERBE")})
+    if dict_context.get("RETCODE") :
+        where_clause.update({"api_res_retcode__exact":dict_context.get("RETCODE")})
     if dict_context.get("USER"):
         where_clause.update({"api_user__contains": dict_context.get("USER")})
     if dict_context.get("URL"):
