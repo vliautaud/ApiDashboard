@@ -132,19 +132,19 @@ $.confirm({
                         <form class="form-inline" action="{% url 'ocado:dashboard'%}" id="FORM_SEARCH" method="POST">
                             {% csrf_token %}
                             <div class="form-group">
-                                <label for="DateDebut">From : </label>
-                                <input class="form-control flatpickr flatpickr-input active" id="DDEB" name="DDEB" style="width:120px"
+                                <label for="DateDebut">From </label>
+                                <input class="form-control flatpickr flatpickr-input active" id="DDEB" name="DDEB" style="width:100px"
                                        type="text" readonly="readonly" placeholder="Date de début" value="{{ SEARCH.DDEB }}">
                             </div>
                             <div class="form-group">
-                                <label for="DFIN">To : </label>
-                                <input class="form-control flatpickr flatpickr-input active" id="DFIN" name="DFIN" style="width:120px"
+                                <label for="DFIN">To </label>
+                                <input class="form-control flatpickr flatpickr-input active" id="DFIN" name="DFIN" style="width:100px"
                                 readonly="readonly" placeholder="Date de fin" value="{{ SEARCH.DFIN }}">
                             </div>
 
                             <div class="form-group">
 
-                                <label for="Verbe">Verbe : </label>
+                                <label for="Verbe">Verbe </label>
                                 <SELECT class="form-control" name="VERBE" id="VERBE" >
                                     <option></option>
                                     <option {% if SEARCH.VERBE == "GET" %}selected {% endif %}>GET</option>
@@ -155,12 +155,16 @@ $.confirm({
                                 </SELECT>
                             </div>
                             <div class="form-group">
-                                <label for="USER">USER : </label>
-                                <input class="form-control" id="USER" name="USER" placeholder="Contient User" value="{{ SEARCH.USER }}" style="width:130px">
+                                <label for="USER">User </label>
+                                <input class="form-control" id="USER" name="USER" placeholder="Contient User" value="{{ SEARCH.USER }}" style="width:100px">
                             </div>
                             <div class="form-group">
-                                <label for="URL">URL : </label>
+                                <label for="URL">URL </label>
                                 <input class="form-control" id="URL" name="URL" placeholder="Contient URL" value="{{ SEARCH.URL }}" style="width:130px">
+                            </div>
+                            <div class="form-group">
+                                <label for="RETCODE">RetCode </label>
+                                <input class="form-control" id="RETCODE" name="RETCODE" placeholder="Code retour" value="{{ SEARCH.RETCODE }}" style="width:110px">
                             </div>
                              <input type="hidden" name="page" id="page" value="{{ latest_calls.number }}"/>
 
@@ -249,7 +253,7 @@ $.confirm({
             <DIV class="panel-body">
                 <DIV class="list-group">
                     {% for code_ret in codes_ret %}
-                    <A class="list-group-item " href="#">
+                    <A class="list-group-item " href="?RETCODE={{ code_ret.api_res_retcode }}">
                         <I class="fa {% if code_ret.api_res_retcode <= "200"  %}fa-child green{% endif %}
                                      {% if code_ret.api_res_retcode > "200" and code_ret.api_res_retcode < "500" %}fa-warning orange {% endif %}
                                      {% if code_ret.api_res_retcode >= "500"  %}fa-bolt red {% endif %} fa-fw"></I>  {{ code_ret.api_res_retcode }}<SPAN class="pull-right text-muted small"><EM>{{ code_ret.id__count }} Occurences</EM></SPAN>
