@@ -113,6 +113,10 @@ def client_api_id(request,api_call_id):
     if (request.POST) :
         # Mise en session de l'objet  OcadoSession si existe pas déjà
         if request.POST.get("optionsRadiosEnv") in ["SANDBOX","TEST","PROD"] :
+            # Teste : Prod uniquement possible pour un superuser
+            if request.POST.get("optionsRadiosEnv") == "PROD" and not request.user.is_superuser :
+                context = {'FORM': request.POST,'ERROR': "Environnement " + request.POST.get("optionsRadiosEnv") + " uniquement autorisé au SuperUser !!!"}
+                return render(request, 'dashboard/OcadoFormCallApi.htm', context)
             # Si environnement selectionné correctement configuré
             if myconf["ENV_"+request.POST.get("optionsRadiosEnv")+"_BASEURL"]:
                 # Si OcadoSession  pas dans la session utilisateur => On le crée
