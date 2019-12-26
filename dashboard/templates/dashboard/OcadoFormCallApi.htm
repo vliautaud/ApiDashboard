@@ -8,7 +8,7 @@
             <div class="panel-heading">
                 Paramêtres d'appel API
             </div>
-            <div class="panel-body">
+            <div class="panel-body" id="pbody">
                 <div class="row">
                     {% if ERROR %}
                     <div class="alert alert-danger alert-dismissable fade in">
@@ -140,6 +140,20 @@
 </div> <!--class row -->
 
 <script>
+if ($("#PROD").prop("checked"))
+{
+ $("#pbody").css("background-color", "red");
+}
+$("#PROD").click(function() {
+    $("#pbody").css("background-color", "red");
+});
+$("#SANDBOX").click(function() {
+    $("#pbody").css("background-color", "#ffffff");
+});
+$("#TEST").click(function() {
+    $("#pbody").css("background-color", "#ffffff");
+});
+
 $( "#raz" ).click(function() {
   $("#GET").prop("checked",true);
   $("#PUT").removeAttr("checked");
