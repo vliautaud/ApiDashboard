@@ -38,7 +38,7 @@ class OcadoSession:
                        "Authorization": "Bearer " + self.bearerToken,
                        "Content-Type": "application/json"}
             res = requests.get(url, proxies=self.proxies, headers=headers, **kwargs)
-        return res
+        return res,headers
 
     def put(self, url, reqId="IdParDefaut", **kwargs):
         if self.bearerToken == None:
@@ -55,7 +55,7 @@ class OcadoSession:
                        "Authorization": "Bearer " + self.bearerToken,
                        "Content-Type": "application/json"}
             res = requests.put(url, proxies=self.proxies, headers=headers, **kwargs)
-        return res
+        return res,headers
 
 
     def post(self, url, reqId="IdParDefaut", **kwargs):
@@ -73,7 +73,7 @@ class OcadoSession:
                        "Authorization": "Bearer " + self.bearerToken,
                        "Content-Type": "application/json"}
             res = requests.post(url, proxies=self.proxies, headers=headers, **kwargs)
-        return res
+        return res,headers
 
 
     def delete(self, url, reqId="IdParDefaut", **kwargs):
@@ -91,5 +91,5 @@ class OcadoSession:
                        "Authorization": "Bearer " + self.bearerToken,
                        "Content-Type": "application/json"}
             res = requests.delete(url, proxies=self.proxies, headers=headers, **kwargs)
-        return res
+        return res,headers
 # Fin Class ocadoSession
