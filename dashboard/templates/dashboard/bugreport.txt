@@ -5,6 +5,7 @@ Tester                  : {{ api_user|safe }}
 Date/Time API Call      : {{ api_call_date|safe }}
 Date/Time Reponse       : {{ api_res_date|safe }}
 Environment             : {{ api_env|safe }}
+Header                  : {{ api_header|safe}}
 
 VERB / URL              : {{ api_verbe|safe }}  {{ api_url|safe }}
 
