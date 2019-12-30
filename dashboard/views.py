@@ -14,6 +14,7 @@ from django.contrib.auth import  logout
 from django.utils import timezone
 from django.conf import settings
 import datetime
+import uuid
 
 
 # ####################################################################
@@ -150,19 +151,19 @@ def client_api_id(request,api_call_id):
         try :
             if request.POST.get("optionsRadiosVerbe")=="GET" :
                 dateheuredeb=timezone.now()
-                res = ocadoSession.get(baseURL+request.POST.get("URL").strip(),"TESTVLD"+str(timezone.now()),**myPayload)
+                res,head = ocadoSession.get(baseURL+request.POST.get("URL").strip(),str(uuid.uuid1()),**myPayload)
                 dateheurefin = timezone.now()
             elif request.POST.get("optionsRadiosVerbe")=="PUT" :
                 dateheuredeb =timezone.now()
-                res = ocadoSession.put(baseURL + request.POST.get("URL").strip(), "TESTVLD" + str(timezone.now()),**myPayload)
+                res,head = ocadoSession.put(baseURL + request.POST.get("URL").strip(),str(uuid.uuid1()),**myPayload)
                 dateheurefin = timezone.now()
             elif request.POST.get("optionsRadiosVerbe") == "POST":
                 dateheuredeb = timezone.now()
-                res = ocadoSession.post(baseURL + request.POST.get("URL").strip(), "TESTVLD" + str(timezone.now()),**myPayload)
+                res,head = ocadoSession.post(baseURL + request.POST.get("URL").strip(),str(uuid.uuid1()),**myPayload)
                 dateheurefin = timezone.now()
             elif request.POST.get("optionsRadiosVerbe") == "DELETE":
                 dateheuredeb = timezone.now()
-                res = ocadoSession.delete(baseURL + request.POST.get("URL").strip(), "TESTVLD" + str(timezone.now()),**myPayload)
+                res,head = ocadoSession.delete(baseURL + request.POST.get("URL").strip(), str(uuid.uuid1()),**myPayload)
                 dateheurefin = timezone.now()
             else :
                 context = {'FORM': request.POST, 'ERROR': "Erreur grave : ni Get, ni PUT, ni POST, ni DELETE !!!"}
@@ -183,7 +184,7 @@ def client_api_id(request,api_call_id):
         appel_api.api_url = baseURL+request.POST.get("URL").strip()
         appel_api.api_prefix_url = baseURL
         appel_api.api_suffix_url = request.POST.get("URL").strip()
-        appel_api.api_header = "TODO : creer getheader sur objet OcadoSession"
+        appel_api.api_header = head
         appel_api.api_payload = request.POST.get("PAYLOAD")
         appel_api.api_res_retcode = res.status_code
         appel_api.api_res_header = res.headers
