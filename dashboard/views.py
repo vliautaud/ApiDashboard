@@ -15,6 +15,9 @@ from django.utils import timezone
 from django.conf import settings
 import datetime
 import uuid
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 # ####################################################################
@@ -23,6 +26,7 @@ import uuid
 # Create your views here.
 @login_required(login_url='/ocado/accounts/login/')
 def dashboard(request):
+    logger.debug("Début view dashboard")
     # Enregistrement du dictionnaire dans la session
     if request.session.get("DICT",False) :
         myconf=request.session.get("DICT", False)
@@ -103,6 +107,7 @@ def dashboard(request):
 ###################################################################
 @login_required(login_url='/ocado/accounts/login/')
 def client_api(request):
+    logger.debug("Début client API sans argument")
     return client_api_id(request,"")
 
 ###################################################################
@@ -110,6 +115,7 @@ def client_api(request):
 ###################################################################
 @login_required(login_url='/ocado/accounts/login/')
 def client_api_id(request,api_call_id):
+    logger.debug("Début client API avec argument :"+str(api_call_id))
     # On est en POST => Demande appel API
     if (request.POST) :
         # Mise en session de l'objet  OcadoSession si existe pas déjà
@@ -123,7 +129,7 @@ def client_api_id(request,api_call_id):
                 # Si OcadoSession  pas dans la session utilisateur => On le crée
                 baseURL = myconf["ENV_"+request.POST.get("optionsRadiosEnv")+"_BASEURL"]
                 if request.POST.get("optionsRadiosEnv") not in request.session :
-                    print("CREATION "+request.POST.get("optionsRadiosEnv")+" SESSION DANS SESSION")
+                    logger.debug("CREATION "+request.POST.get("optionsRadiosEnv")+" SESSION DANS SESSION")
                     sandbox_session = OcadoSession.OcadoSession(urlAccessToken=myconf["ENV_"+request.POST.get("optionsRadiosEnv")+"_ACCESS_TOKEN"],
                                                                 clientId=myconf["ENV_"+request.POST.get("optionsRadiosEnv")+"_CLIENT_ID"],
                                                                 clientSecret=myconf["ENV_"+request.POST.get("optionsRadiosEnv")+"_CLIENT_SECRET"],
@@ -143,7 +149,7 @@ def client_api_id(request,api_call_id):
                 #payload = request.POST.get("PAYLOAD")
                 myPayload = {"json": payload}
             except:
-                print("Payload impossible à parser :",request.POST.get("PAYLOAD"))
+                logger.debug("Payload impossible à parser :"+request.POST.get("PAYLOAD"))
                 context = {'FORM': request.POST, 'ERROR': "Impossible de parser le PAYLOAD JSON - Veuillez corriger !!!"}
                 return render(request, 'dashboard/OcadoFormCallApi.htm', context)
         # A ce stade : Tout semble Ok => On récupère le bon objet OcadoSession et on lance l'API
