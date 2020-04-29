@@ -40,5 +40,5 @@ def config_dict(filename):
 # #############################################################
 def fwk_init(conf_file) :
     myconf = config_dict(conf_file)
-    #logging.basicConfig(filename=myconf["LOG_FILE"],level=myconf["LOG_LEVEL"],format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %H:%M:%S %p')
+    logging.basicConfig(filename=myconf["LOG_FILE"],level=myconf["LOG_LEVEL"],format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %H:%M:%S %p')
     return myconf
