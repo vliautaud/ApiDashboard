@@ -1,7 +1,12 @@
 import requests
+import logging
 
-class OcadoSession:
+
+
+class OcadoSession :
+    logger = logging.getLogger(__name__)
     def __init__(self, urlAccessToken, clientId, clientSecret, apiKey, proxy={}):
+        OcadoSession.logger.debug("Debut OcadoSession : init")
         self.clientId = clientId
         self.clientSecret = clientSecret
         self.apiKey = apiKey
@@ -15,13 +20,17 @@ class OcadoSession:
                          'Content-Type' : 'application/x-www-form-urlencoded'}
         self.bearerToken = None
         self.urlAccessToken = urlAccessToken
+        OcadoSession.logger.debug("Fin OcadoSession : init")
 
     # Pour rafraichir le Berer Token en cas de besoin
     def refreshToken(self):
+        OcadoSession.logger.debug("Debut de RefreshToken")
         res = requests.post(self.urlAccessToken, proxies=self.proxies, headers=self.headers, data=self.data)
         resJson = res.json()
+        OcadoSession.logger.debug("Refresh Token"+resJson["access_token"])
         # TODO : Verifier existence du Refresh Token sinon sortir en erreur...
         self.bearerToken = resJson["access_token"]
+        OcadoSession.logger.debug("Fin de RefreshToken")
 
     def get(self, url, reqId="IdParDefaut", **kwargs):
         if self.bearerToken == None:
