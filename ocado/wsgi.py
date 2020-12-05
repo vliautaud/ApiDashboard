@@ -11,8 +11,6 @@ import os
 import sys
 
 from django.core.wsgi import get_wsgi_application
-# INDISPENSABLE POUR FAIRE FONCTIONNER AVEC APACHE
-sys.path.append('/Users/Vincent/PycharmProjects/ocado')
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'ocado.settings')
 
 application = get_wsgi_application()
