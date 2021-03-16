@@ -5,6 +5,7 @@ import smtplib, os
 from email.mime.multipart import MIMEMultipart
 from email.mime.base import MIMEBase
 from email.mime.text import MIMEText
+from email.mime.image import MIMEImage
 from email.utils import COMMASPACE, formatdate
 from email import encoders
 
@@ -61,24 +62,36 @@ def uncompressURL(url,filename,proxy) :
 
 # ####################################################
 # Envoi de mail
+# Utiliser message_text ou message_html mais pas les 2
+# => Si les 2 sont renseignés => seul message_text sera intégré au corps du mail (message html sera en pièce jointe)
 # ####################################################
-
-def send_mail( send_from, send_to, subject, text, files=[], server="localhost", port=587, username='', password='', isTls=True):
+def send_mail(send_from, send_to, subject, message_text="",files=[], server="localhost", port=587, username='', password='', isTls=True,message_html="", embeddedImages={}):
     msg = MIMEMultipart()
     msg['From'] = send_from
     msg['To'] = COMMASPACE.join(send_to)
     msg['Date'] = formatdate(localtime = True)
     msg['Subject'] = subject
-    msg.attach( MIMEText(text) )
+    if message_text :
+        msg.attach(MIMEText(message_text))
+    if message_html :
+        msg.attach(MIMEText(message_html, 'html'))
     for f in files:
         part = MIMEBase('application', "octet-stream")
         part.set_payload( open(f,"rb").read() )
         encoders.encode_base64(part)
         part.add_header('Content-Disposition', 'attachment; filename="{0}"'.format(os.path.basename(f)))
         msg.attach(part)
-        smtp = smtplib.SMTP(server, port)
-        if isTls:
-            smtp.starttls()
-        smtp.login(username,password)
-        smtp.sendmail(send_from, send_to, msg.as_string())
-        smtp.quit()
+    for ikey in embeddedImages.keys() :
+        fp=open(embeddedImages[ikey],'rb')
+        msgImage = MIMEImage(fp.read())
+        fp.close()
+        # Define the image's ID as referenced above
+        msgImage.add_header('Content-ID', ikey)
+        msg.attach(msgImage)
+    # Après avoir consitué le message => On le transmet...
+    smtp = smtplib.SMTP(server, port)
+    if isTls:
+        smtp.starttls()
+    smtp.login(username,password)
+    smtp.sendmail(send_from, send_to, msg.as_string())
+    smtp.quit()
