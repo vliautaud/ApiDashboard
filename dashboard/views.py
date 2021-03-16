@@ -26,7 +26,7 @@ logger = logging.getLogger(__name__)
 # Create your views here.
 @login_required(login_url='/ocado/accounts/login/')
 def dashboard(request):
-    logger.debug("Début view dashboard")
+    logger.debug("Debut view dashboard")
     # Enregistrement du dictionnaire dans la session
     if request.session.get("DICT",False) :
         myconf=request.session.get("DICT", False)
@@ -115,7 +115,7 @@ def client_api(request):
 ###################################################################
 @login_required(login_url='/ocado/accounts/login/')
 def client_api_id(request,api_call_id):
-    logger.debug("Début client API avec argument :"+str(api_call_id))
+    logger.debug("Debut client API avec argument :"+str(api_call_id))
     # On est en POST => Demande appel API
     if (request.POST) :
         # Mise en session de l'objet  OcadoSession si existe pas déjà
@@ -149,7 +149,7 @@ def client_api_id(request,api_call_id):
                 #payload = request.POST.get("PAYLOAD")
                 myPayload = {"json": payload}
             except:
-                logger.debug("Payload impossible à parser :"+request.POST.get("PAYLOAD"))
+                logger.debug("Payload impossible a parser :"+request.POST.get("PAYLOAD"))
                 context = {'FORM': request.POST, 'ERROR': "Impossible de parser le PAYLOAD JSON - Veuillez corriger !!!"}
                 return render(request, 'dashboard/OcadoFormCallApi.htm', context)
         # A ce stade : Tout semble Ok => On récupère le bon objet OcadoSession et on lance l'API
