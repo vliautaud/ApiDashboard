@@ -2,6 +2,7 @@ import logging
 import requests
 import gzip
 import smtplib, os
+import os.path
 from email.mime.multipart import MIMEMultipart
 from email.mime.base import MIMEBase
 from email.mime.text import MIMEText
@@ -49,7 +50,7 @@ def config_dict(filename):
 # #############################################################
 def fwk_init(conf_file) :
     myconf = config_dict(conf_file)
-    logging.basicConfig(filename=myconf["LOG_FILE"],level=myconf["LOG_LEVEL"],format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %H:%M:%S %p')
+    logging.basicConfig(filename=os.path.join(os.path.dirname(conf_file),myconf["LOG_FILE"]),level=myconf["LOG_LEVEL"],format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %H:%M:%S %p')
     return myconf
 # #################################################################
 # Decompresse une URM contenant un fichier zip vers fichier cible
