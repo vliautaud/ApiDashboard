@@ -1,7 +1,7 @@
 from django.urls import path,include
 from django.contrib.auth import views as auth_views
 
-from . import views
+from . import views,views_webhook
 
 app_name = 'ocado'
 urlpatterns = [
@@ -14,6 +14,7 @@ urlpatterns = [
     path('client_api', views.client_api, name='client_api'),
     path('<int:api_call_id>/client_api/', views.client_api_id, name='client_api_id'),
     path('accounts/', include('django.contrib.auth.urls')),
+    path('webhook/', views_webhook.webhook, name='webhook'),
 ]
 
 
