@@ -33,6 +33,8 @@ def webhook(request):
             webhook_event=request.META["HTTP_X_OSP_WEBHOOK_EVENT_NAME"]
             if webhook_event=="orderCancelled" :
                 return orderCancelled(request,webhook_event)
+            elif webhook_event =="homeDeliveryFulfillmentMarkedAsCanceled" :
+                return homeDeliveryFulfillmentMarkedAsCanceled(request, webhook_event)
             else :
                 HttpResponseForbidden("Type de webhook non pris en charge...")
         except Exception as err :
@@ -70,6 +72,38 @@ def orderCancelled(request,webhook_event):
                             embeddedImages={"image1": settings.BASE_DIR+"/dashboard/static/dashboard/images/logoOlog.jpg"}    )
 
         return HttpResponse("Webhook de type %s et body %s cancellationReason %s" % (str(webhook_event),webhook_body["orderId"],cancelationReason))
+        #return HttpResponse()
+    except Exception as err :
+        return HttpResponseBadRequest("Erreur interne traitement de Webhook :"+ webhook_event +" : Exception : "+ str(err))
+
+def homeDeliveryFulfillmentMarkedAsCanceled(request,webhook_event):
+    logger.debug("Debut traitement du webhook homeDeliveryFulfillmentMarkedAsCanceled...")
+    try :
+        webhook_body=json.loads(request.body.decode("utf-8"))
+        baseURL = myconf["ENV_PROD_BASEURL"]
+        osp_session = OcadoSession.OcadoSession(
+            urlAccessToken=myconf["ENV_PROD_ACCESS_TOKEN"],
+            clientId=myconf["ENV_PROD_CLIENT_ID"],
+            clientSecret=myconf["ENV_PROD_CLIENT_SECRET"],
+            apiKey=myconf["ENV_PROD_APIKEY"],
+            proxy=dict(eval(myconf["PROXY"])))
+        res,head=osp_session.get(baseURL+"/v1/fulfillments/"+webhook_body["fulfillmentId"],str(uuid.uuid1()))
+        orderId=res.json()["orderId"]
+        # Envoi du mail
+        vil_tools.send_mail("noreply@ologistique.fr",
+                        myconf["MAIL_DEST"].split(";"),
+                        "Annulation de commande : " + orderId + " le " + datetime.datetime.now().strftime(
+                            "%Y/%m/%d"),
+                        message_text="",
+                        files=[],
+                        server=myconf["MAIL_SMTP"],
+                        port=myconf["MAIL_PORT"],
+                        username=myconf["MAIL_USER"],
+                        password=myconf["MAIL_PWD"],
+                        message_html=template % (orderId, datetime.datetime.now().strftime("%Y/%m/%d %H:%M:%S")),
+                        embeddedImages={"image1": settings.BASE_DIR+"/dashboard/static/dashboard/images/logoOlog.jpg"}    )
+
+        return HttpResponse("Webhook de type %s et orderId %s" % (str(webhook_event),orderId))
         #return HttpResponse()
     except Exception as err :
         return HttpResponseBadRequest("Erreur interne traitement de Webhook :"+ webhook_event +" : Exception : "+ str(err))
