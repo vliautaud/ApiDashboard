@@ -35,12 +35,46 @@ def webhook(request):
                 return orderCancelled(request,webhook_event)
             elif webhook_event =="homeDeliveryFulfillmentMarkedAsCanceled" :
                 return homeDeliveryFulfillmentMarkedAsCanceled(request, webhook_event)
+            elif webhook_event =="shipmentReportAvailable" :
+                return shipmentReportAvailable(request, webhook_event)
             else :
                 HttpResponseForbidden("Type de webhook non pris en charge...")
         except Exception as err :
             return HttpResponseBadRequest("Erreur interne traitement de Webhook :"+str(err))
     else :
         return HttpResponseForbidden("Methode POST obligatoire...")
+
+
+def shipmentReportAvailable(request,webhook_event):
+    logger.debug("Debut traitement du webhook shipmentReportAvailable...")
+    try :
+        webhook_body=json.loads(request.body.decode("utf-8"))
+        baseURL = myconf["ENV_PROD_BASEURL"]
+        osp_session = OcadoSession.OcadoSession(
+            urlAccessToken=myconf["ENV_PROD_ACCESS_TOKEN"],
+            clientId=myconf["ENV_PROD_CLIENT_ID"],
+            clientSecret=myconf["ENV_PROD_CLIENT_SECRET"],
+            apiKey=myconf["ENV_PROD_APIKEY"],
+            proxy=dict(eval(myconf["PROXY"])))
+        res,head=osp_session.get(baseURL+"/v1/shipments/"+webhook_body["shipmentId"]+"/report",str(uuid.uuid1()))
+        shipmentReport=res.json()
+        shipmentType=shipmentReport["shipmentType"]
+        if shipmentType == "TRANSFER" :
+            res, head = osp_session.get(baseURL + "/v1/transfer-shipments/" + webhook_body["shipmentId"],str(uuid.uuid1()))
+            logger.info("SHIPMENT_ID : %s TRANSFERT : %s HEURE : %s" % (webhook_body["shipmentId"],res.json()["shipmentName"],datetime.datetime.now().strftime("%Y/%m/%d %H:%M:%S")))
+        elif shipmentType == "HOME_DELIVERY" :
+            try :
+                res, head = osp_session.get(baseURL + "/v3/routes?fulfillmentId=" + shipmentReport["containers"][0]["containers"][0]["orderLines"][0]["fulfillmentId"],str(uuid.uuid1()))
+            except Exception as e:
+                res, head = osp_session.get(baseURL + "/v3/routes?fulfillmentId=" +shipmentReport["containers"][0]["containers"][0]["containers"][0]["orderLines"][0]["fulfillmentId"], str(uuid.uuid1()))
+            logger.info("SHIPMENT_ID : %s ROUTE : %s HEURE : %s" % (webhook_body["shipmentId"], res.json()[0]["routeName"],datetime.datetime.now().strftime("%Y/%m/%d %H:%M:%S")))
+        else :
+            logger.error("SHIPMENT_ID : %s de type inconnu" % (webhook_body["shipmentId"]))
+        return HttpResponse("Webhook de type %s et ShipmentId %s" % (str(webhook_event),webhook_body["shipmentId"]))
+        #return HttpResponse()
+    except Exception as err :
+        return HttpResponseBadRequest("Erreur interne traitement de Webhook :"+ webhook_event +" : Exception : "+ str(err))
+
 
 
 def orderCancelled(request,webhook_event):
@@ -89,18 +123,19 @@ def homeDeliveryFulfillmentMarkedAsCanceled(request,webhook_event):
             proxy=dict(eval(myconf["PROXY"])))
         res,head=osp_session.get(baseURL+"/v1/fulfillments/"+webhook_body["fulfillmentId"],str(uuid.uuid1()))
         orderId=res.json()["orderId"]
+        res2, head2 = osp_session.get(baseURL + "/v3/routes?fulfillmentId=" + webhook_body["fulfillmentId"], str(uuid.uuid1()))
+        routeName=res2.json()[0]["routeName"]
         # Envoi du mail
         vil_tools.send_mail("noreply@ologistique.fr",
                         myconf["MAIL_DEST"].split(";"),
-                        "Annulation de commande : " + orderId + " le " + datetime.datetime.now().strftime(
-                            "%Y/%m/%d"),
+                        "Annulation de commande : " + orderId + " , Route : " +routeName + " le " + datetime.datetime.now().strftime("%Y/%m/%d"),
                         message_text="",
                         files=[],
                         server=myconf["MAIL_SMTP"],
                         port=myconf["MAIL_PORT"],
                         username=myconf["MAIL_USER"],
                         password=myconf["MAIL_PWD"],
-                        message_html=template % (orderId, datetime.datetime.now().strftime("%Y/%m/%d %H:%M:%S")),
+                        message_html=template % (orderId, datetime.datetime.now().strftime("%Y/%m/%d %H:%M:%S"),routeName),
                         embeddedImages={"image1": settings.BASE_DIR+"/dashboard/static/dashboard/images/logoOlog.jpg"}    )
 
         return HttpResponse("Webhook de type %s et orderId %s" % (str(webhook_event),orderId))
@@ -181,7 +216,7 @@ template="""
                      </b>
                   </p>
                </td>
-               <td width=313 valign=top style='width:234.9pt;border-top:solid #70AD47 1.0pt;border-left:none;border-bottom:none;border-right:solid #70AD47 1.0pt;background:#70AD47;padding:0cm 5.4pt 0cm 5.4pt'>
+               <td width=200 valign=top style='border-top:solid #70AD47 1.0pt;border-left:none;border-bottom:none;border-right:solid #70AD47 1.0pt;background:#70AD47;padding:0cm 5.4pt 0cm 5.4pt'>
                   <p class=MsoNormal>
                      <b>
                         <span style='color:white'>
@@ -191,9 +226,19 @@ template="""
                      </b>
                   </p>
                </td>
+               <td width=200 valign=top style='border-top:solid #70AD47 1.0pt;border-left:none;border-bottom:none;border-right:solid #70AD47 1.0pt;background:#70AD47;padding:0cm 5.4pt 0cm 5.4pt'>
+                  <p class=MsoNormal>
+                     <b>
+                        <span style='color:white'>
+                           Route
+                           <o:p></o:p>
+                        </span>
+                     </b>
+                  </p>
+               </td>
             </tr>
             <tr>
-               <td width=313 valign=top style='width:234.9pt;border:solid #70AD47 1.0pt;border-right:none;background:white;padding:0cm 5.4pt 0cm 5.4pt'>
+               <td width=200 valign=top style='border:solid #70AD47 1.0pt;border-right:none;background:white;padding:0cm 5.4pt 0cm 5.4pt'>
                   <p class=MsoNormal>
                      <b>
                         %s
@@ -201,7 +246,13 @@ template="""
                      </b>
                   </p>
                </td>
-               <td width=313 valign=top style='width:234.9pt;border:solid #70AD47 1.0pt;border-left:none;padding:0cm 5.4pt 0cm 5.4pt'>
+               <td width=200 valign=top style='border:solid #70AD47 1.0pt;border-left:none;border-right:none;padding:0cm 5.4pt 0cm 5.4pt'>
+                  <p class=MsoNormal>
+                     %s
+                     <o:p></o:p>
+                  </p>
+               </td>
+               <td width=200 valign=top style='border:solid #70AD47 1.0pt;border-left:none;padding:0cm 5.4pt 0cm 5.4pt'>
                   <p class=MsoNormal>
                      %s
                      <o:p></o:p>
