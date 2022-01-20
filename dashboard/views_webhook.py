@@ -17,6 +17,7 @@ from django.conf import settings
 import datetime
 import uuid
 import logging
+from django.core.cache import cache
 
 logger = logging.getLogger(__name__)
 
@@ -61,12 +62,14 @@ def shipmentReportAvailable(request,webhook_event):
         shipmentType=shipmentReport["shipmentType"]
         if shipmentType == "TRANSFER" :
             res, head = osp_session.get(baseURL + "/v1/transfer-shipments/" + webhook_body["shipmentId"],str(uuid.uuid1()))
+            cache.set(res.json()["shipmentName"],{"ShipmentId" : webhook_body["shipmentId"], "DateTime" :  datetime.datetime.now().strftime("%Y/%m/%d %H:%M:%S")})
             logger.info("SHIPMENT_ID : %s TRANSFERT : %s HEURE : %s" % (webhook_body["shipmentId"],res.json()["shipmentName"],datetime.datetime.now().strftime("%Y/%m/%d %H:%M:%S")))
         elif shipmentType == "HOME_DELIVERY" :
             try :
                 res, head = osp_session.get(baseURL + "/v3/routes?fulfillmentId=" + shipmentReport["containers"][0]["containers"][0]["orderLines"][0]["fulfillmentId"],str(uuid.uuid1()))
             except Exception as e:
                 res, head = osp_session.get(baseURL + "/v3/routes?fulfillmentId=" +shipmentReport["containers"][0]["containers"][0]["containers"][0]["orderLines"][0]["fulfillmentId"], str(uuid.uuid1()))
+            cache.set(res.json()[0]["routeName"], {"ShipmentId": webhook_body["shipmentId"],"DateTime": datetime.datetime.now().strftime("%Y/%m/%d %H:%M:%S")})
             logger.info("SHIPMENT_ID : %s ROUTE : %s HEURE : %s" % (webhook_body["shipmentId"], res.json()[0]["routeName"],datetime.datetime.now().strftime("%Y/%m/%d %H:%M:%S")))
         else :
             logger.error("SHIPMENT_ID : %s de type inconnu" % (webhook_body["shipmentId"]))
@@ -142,6 +145,14 @@ def homeDeliveryFulfillmentMarkedAsCanceled(request,webhook_event):
         #return HttpResponse()
     except Exception as err :
         return HttpResponseBadRequest("Erreur interne traitement de Webhook :"+ webhook_event +" : Exception : "+ str(err))
+
+def get_shipment(request,route_or_transfert_id):
+    response = HttpResponse(json.dumps(cache.get(route_or_transfert_id)), content_type="application/json")
+    return response
+    #return HttpResponse(str(cache.get(route_or_transfert_id)))
+
+
+
 
 # ##########################################################################
 # Main : Au chargement du module => On charge le fichier de conf de l'appli
