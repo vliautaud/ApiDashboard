@@ -15,6 +15,7 @@ urlpatterns = [
     path('<int:api_call_id>/client_api/', views.client_api_id, name='client_api_id'),
     path('accounts/', include('django.contrib.auth.urls')),
     path('webhook/', views_webhook.webhook, name='webhook'),
+    
 ]
 
 
