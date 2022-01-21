@@ -1,2 +1,2 @@
 Attention : Compliqué pour faire fonctionner avec APACHE
-Necessité de modifier wsgi.py (sans quoi librairie non chargées correctement)
+Necessité de modifier wsgi.py (sans quoi librairie non chargées correctement)...
